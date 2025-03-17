@@ -3,7 +3,21 @@
 default_language_version:
     python: python3.10
 repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.4.0
+      hooks:
+          - id: check-yaml
+          - id: check-added-large-files
     - repo: https://github.com/ambv/black
       rev: 23.7.0
       hooks:
           - id: black
+    - repo: https://github.com/pycqa/pydocstyle
+      rev: 6.3.0 # pick a git hash / tag to point to
+      hooks:
+          - id: pydocstyle
+    - repo: https://github.com/pycqa/pylint
+      rev: v2.12.2
+      hooks:
+          - id: pylint
+            entry: bash -c 'pylint ./src --rcfile=.pylintrc --fail-under=9.5'

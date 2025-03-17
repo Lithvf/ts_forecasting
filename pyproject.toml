@@ -1,14 +1,17 @@
 [tool.poetry]
-name = "repo"
+name = "assignment fvanlith"
 version = "1"
-description = "example how to make a repo"
-authors = ["Your Name <you@example.com>"]
+description = "standard repo"
+authors = ["lithvf@gmail.com"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
 pandas = "^2.2.3"
 ipykernel = "^6.29.5"
+pylint = "^3.3.5"
+black = "^25.1.0"
+pre-commit = "^4.1.0"
 
 
 [build-system]

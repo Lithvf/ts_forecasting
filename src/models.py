@@ -6,21 +6,41 @@ from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
 
 
 class FitModel:
-    def __init__(self, model_cls, X_train, y_train, train, plot=False):
+    def __init__(self, model_cls, X_train, y_train, train, param_grid=None, plot=False):
         self.model = model_cls
         self.X_train = X_train.copy()
         self.y_train = y_train.copy()
         self.train = train.copy()
+        self.param_grid = param_grid
         self.plot = plot
-        self.fit()
+        if self.param_grid:
+            self.fit_gridsearch()
+        else:
+            self.fit()
         self.metrics()
         self.plot_fit()
 
     def fit(self):
         self.trained_model = self.model.fit(X=self.X_train, y=self.y_train)
+        self.y_pred_train = self.trained_model.predict(self.X_train)
+
+    def fit_gridsearch(self):
+        tscv = TimeSeriesSplit(n_splits=3)
+
+        grid_search = GridSearchCV(
+            estimator=self.model,
+            param_grid=self.param_grid,
+            scoring="neg_mean_squared_error",
+            cv=tscv,
+            verbose=1,
+            n_jobs=-1,
+        )
+        grid_search.fit(self.X_train, self.y_train)
+        self.trained_model = grid_search.best_estimator_
         self.y_pred_train = self.trained_model.predict(self.X_train)
 
     def metrics(self):

@@ -53,6 +53,7 @@ class CreateFeatures:
         """
         Adds lag features for the target variable.
         """
+        # TODO: Create config that has a list of lag features
         if lags is None:
             lags = list(range(0, 8)) + [24, 24 * 7]
 

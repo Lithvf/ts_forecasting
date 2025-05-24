@@ -75,9 +75,3 @@ class Model:
         grid_search.fit(self.X_train, self.y_train)
         self.trained_model = grid_search.best_estimator_
         self.y_pred_train = self.trained_model.predict(self.X_train)
-
-    def _report_metrics(self):
-        rmse = np.sqrt(mean_squared_error(self.y_train, self.y_pred_train))
-        r2 = r2_score(self.y_train, self.y_pred_train)
-        print(f"RMSE = {rmse:0.2f}")
-        print(f"R2 = {r2:0.2f}")

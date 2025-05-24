@@ -59,31 +59,6 @@ class EnergyUsageData:
         return self.raw_data
 
 
-# class SplitData:
-#     def __init__(self, raw_data, timestamp_start, timestamp_end, plot=False):
-#         self.raw_data = raw_data.copy()
-#         self.timestamp_start = timestamp_start
-#         self.timestamp_end = timestamp_end
-#         self.plot = plot
-#         self.train, self.test = self.split_data_set()
-#         self.plot_train_test()
-
-#     def split_data_set(self):
-#         self.raw_data.set_index("datetime", inplace=True)
-#         train = self.raw_data.loc[self.raw_data.index <= self.timestamp_start].copy()
-#         test = self.raw_data.loc[self.raw_data.index > self.timestamp_start].copy()
-#         return train, test
-
-#     def split_data_cv(self):
-#         pass
-
-#     def plot_train_test(self):
-#         if self.plot == True:
-#             self.train.rename(columns={"PJME_MW": "train_set"}).join(
-#                 self.test.rename(columns={"PJME_MW": "test_set"}), how="outer"
-#             ).plot(style=".", xlabel="MW", title="train-test split PJME")
-
-
 class SplitData:
     """
     A class to split time-series data into training and testing sets,

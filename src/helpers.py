@@ -2,6 +2,7 @@
 
 from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
+import pandas as pd
 
 
 class MetricsReporting:
@@ -20,22 +21,19 @@ class MetricsReporting:
     def _calculate_metrics(self):
         """Internal method to calculate all relevant metrics."""
 
-        self.metrics["rmse"] = np.nan
-        self.metrics["r2"] = np.nan
-        self.metrics["mape"] = np.nan
-
         if self.y_pred.ndim > 1:
             num_horizons = self.y_pred.shape[1]
             self.metrics["rmse_overall"] = np.sqrt(
                 mean_squared_error(self.y_true, self.y_pred)
             )
             self.metrics["r2_overall"] = r2_score(self.y_true, self.y_pred)
-
+            self.metrics["horizon"] = []
             self.metrics["rmse_per_horizon"] = []
             self.metrics["r2_per_horizon"] = []
             self.metrics["mape_per_horizon"] = []
 
             for i in range(num_horizons):
+                self.metrics["horizon"].append(f"t+{i + 1}")
                 y_true_h = self.y_true[:, i]
                 y_pred_h = self.y_pred[:, i]
 
@@ -68,7 +66,8 @@ class MetricsReporting:
 
     def print(self):
         self._calculate_metrics()
-        print(self.metrics)
+        metrics_df = pd.DataFrame(self.metrics)
+        print(metrics_df)
         # print(f"RMSE = {self.rmse:0.2f}")
         # print(f"R2 = {self.r2:0.2f}")
 

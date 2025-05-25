@@ -53,7 +53,6 @@ class Model:
             self._fit_gridsearch(param_grid)
         else:
             self._fit_standard()
-        self._report_metrics()
 
     def _fit_standard(self):
         """Internal method for standard model fitting."""

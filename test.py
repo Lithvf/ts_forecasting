@@ -8,7 +8,7 @@ import pandas as pd
 
 if __name__ == "__main__":
     timestamp = "01-Jan-2016"
-    horizon = 3
+    horizon = 48
     raw_data = EnergyUsageData(path="data/PJME_hourly.csv").get_data()
     split_data = SplitData(raw_data, timestamp, False)
     X_train, y_train = CreateFeatures(
@@ -24,3 +24,4 @@ if __name__ == "__main__":
 
     reporting = MetricsReporting(trained_model.y_pred_train, trained_model.y_train)
     reporting.print()
+    reporting.plot_metrics()

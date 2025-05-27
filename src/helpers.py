@@ -8,8 +8,14 @@ import matplotlib.pyplot as plt
 
 class MetricsReporting:
     def __init__(self, y_pred, y_true):
+        y_true = y_true.copy()
+        y_pred = y_pred.copy()
+        y_true.set_index("datetime", inplace=True)
+        y_true = y_true.loc[y_pred.index]
         self.y_pred = np.asarray(y_pred)
         self.y_true = np.asarray(y_true)
+        if self.y_pred.ndim == 2 and self.y_pred.shape[1] == 1:
+            self.y_pred = self.y_pred.flatten()
         self.metrics = {}
         self.sample = {}
 
@@ -63,6 +69,14 @@ class MetricsReporting:
                     self.metrics["rmse_per_horizon"].append(np.nan)
                     self.metrics["r2_per_horizon"].append(np.nan)
                     self.metrics["mape_per_horizon"].append(np.nan)
+        else:
+            self.metrics["rmse"] = [
+                np.sqrt(mean_squared_error(self.y_true, self.y_pred))
+            ]
+            self.metrics["r2"] = [r2_score(self.y_true, self.y_pred)]
+            self.metrics["mape"] = [
+                np.mean(np.abs((self.y_true - self.y_pred) / self.y_true)) * 100
+            ]
 
     def print(self):
         self._calculate_metrics()
@@ -70,38 +84,49 @@ class MetricsReporting:
         print(self.metrics_df)
 
     def plot_metrics(self):
-        fig, axes = plt.subplots(1, 3, figsize=(24, 6))
-        axes[0].plot(
-            self.metrics_df[["horizon", "rmse_per_horizon"]].set_index("horizon"),
-        )
-        axes[0].set_title("RMSE")
-        axes[0].set_ylabel("MW")
-        axes[1].plot(
-            self.metrics_df[["horizon", "r2_per_horizon"]].set_index("horizon"),
-        )
-        axes[1].set_title("R2")
-        axes[1].set_ylabel("Per unit")
-        axes[2].plot(
-            self.metrics_df[["horizon", "mape_per_horizon"]].set_index("horizon"),
-        )
-        axes[2].set_title("MAPE")
-        axes[2].set_ylabel("Percentage")
+        if self.y_pred.ndim <= 1:
+            print("One dimensional data is not plotted")
+        else:
+            if not self.metrics:
+                self._calculate_metrics()
+                self.metrics_df = pd.DataFrame(self.metrics)
+            fig, axes = plt.subplots(1, 3, figsize=(24, 6))
+            axes[0].plot(
+                self.metrics_df[["horizon", "rmse_per_horizon"]].set_index("horizon"),
+            )
+            axes[0].set_title("RMSE")
+            axes[0].set_ylabel("MW")
+            axes[1].plot(
+                self.metrics_df[["horizon", "r2_per_horizon"]].set_index("horizon"),
+            )
+            axes[1].set_title("R2")
+            axes[1].set_ylabel("Per unit")
+            axes[2].plot(
+                self.metrics_df[["horizon", "mape_per_horizon"]].set_index("horizon"),
+            )
+            axes[2].set_title("MAPE")
+            axes[2].set_ylabel("Percentage")
 
-        for ax in axes:
-            ax.tick_params(axis="x", labelsize=8)
-            for label in ax.get_xticklabels():
-                label.set_rotation(90)
+            for ax in axes:
+                ax.tick_params(axis="x", labelsize=8)
+                for label in ax.get_xticklabels():
+                    label.set_rotation(90)
 
-        plt.tight_layout()
-        plt.show()
+            plt.tight_layout()
+            plt.show()
 
 
 class PlotPredictionActual:
-    def __init__(self, actual: pd.DataFrame, y_pred: pd.DataFrame, timestamp: str):
+    def __init__(
+        self, actual: pd.DataFrame, y_pred: pd.DataFrame, timestamp: str = None
+    ):
         self.actual = actual
         self.actual.set_index("datetime", inplace=True)
         self.y_pred = y_pred
-        self.timestamp = pd.to_datetime(timestamp)
+        if timestamp:
+            self.timestamp = pd.to_datetime(timestamp)
+        else:
+            self.timestamp = self.y_pred.reset_index()["datetime"].iloc[0]
 
     def restructure_prediction(self):
         filtered_y_pred = self.y_pred.loc[[self.timestamp]]
@@ -116,7 +141,10 @@ class PlotPredictionActual:
         return df_predict
 
     def plot_sample(self):
-        pred = self.restructure_prediction()
+        if self.y_pred.shape[1] > 1:
+            pred = self.restructure_prediction()
+        else:
+            pred = self.y_pred
         if not self.actual.index.intersection(pred.index).empty:
             actual_prediction = pd.merge(
                 self.actual,

@@ -53,3 +53,42 @@ class RecursiveForecaster:
             self.test["Forecast"] = self.forecasts
             self.test.plot()
             plt.show()
+
+
+class MultiHorizonForecaster:
+    def __init__(self, model, history_data, horizon):
+        """
+        Parameters:
+        - model: trained MultiOutputRegressor
+        - history_data: DataFrame with latest known time series values
+        - y_test: true multi-step targets for evaluation
+        - test: original test set for plotting
+        - steps: number of steps to forecast (should match training horizon)
+        - plot: whether to plot forecast
+        """
+        self.model = model
+        self.history_data = history_data
+        self.horizon = horizon
+
+        self.forecasts = self.forecaster()
+
+    def forecaster(self):
+        cf = CreateFeatures(
+            self.history_data,
+            target="PJME_MW",
+            purpose="inference",
+            horizon=self.horizon,
+        )
+        X_latest = cf.X.iloc[[-1]]
+        timestamp = X_latest.reset_index()["datetime"].iloc[0]
+        y_preds = self.model.predict(X_latest)[0]
+        datetime_index = pd.date_range(
+            start=timestamp + pd.Timedelta(hours=1),
+            periods=self.horizon,
+            freq="h",
+        )
+        y_preds = pd.Series(y_preds)
+        df_forecast = y_preds.to_frame(name=f"Prediction {timestamp}")
+        df_forecast["datetime"] = datetime_index
+        df_forecast.set_index("datetime", inplace=True)
+        return df_forecast

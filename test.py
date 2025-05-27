@@ -1,7 +1,8 @@
 from src.utils import EnergyUsageData, SplitData
 from src.features import CreateFeatures
 from src.models import Model
-from src.helpers import MetricsReporting
+
+from src.helpers import MetricsReporting, PlotPredictionActual
 from xgboost import XGBRegressor
 import pandas as pd
 
@@ -21,7 +22,12 @@ if __name__ == "__main__":
     trained_model = Model(XGBRegressor)
 
     trained_model.train(X_train, y_train, split_data.train)
+    # reporting = MetricsReporting(trained_model.y_pred_train, trained_model.y_train)
+    # # reporting.print()
+    # # reporting.plot_metrics()
 
-    reporting = MetricsReporting(trained_model.y_pred_train, trained_model.y_train)
-    reporting.print()
-    reporting.plot_metrics()
+    print(trained_model.y_pred_train.tail())
+
+    x = PlotPredictionActual(
+        split_data.train, trained_model.y_pred_train, "30-Dec-2015"
+    ).plot_sample()

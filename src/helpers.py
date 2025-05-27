@@ -11,6 +11,7 @@ class MetricsReporting:
         self.y_pred = np.asarray(y_pred)
         self.y_true = np.asarray(y_true)
         self.metrics = {}
+        self.sample = {}
 
     def _calculate_metrics(self):
         """Internal method to calculate all relevant metrics."""
@@ -25,6 +26,10 @@ class MetricsReporting:
             self.metrics["rmse_per_horizon"] = []
             self.metrics["r2_per_horizon"] = []
             self.metrics["mape_per_horizon"] = []
+
+            self.sample["horizon"] = []
+            self.sample["prediction"] = []
+            self.sample["actual"] = []
 
             for i in range(num_horizons):
                 self.metrics["horizon"].append(f"t+{i + 1}")
@@ -53,6 +58,7 @@ class MetricsReporting:
                     self.metrics["mape_per_horizon"].append(
                         np.nanmean(abs_percentage_error)
                     )
+
                 else:
                     self.metrics["rmse_per_horizon"].append(np.nan)
                     self.metrics["r2_per_horizon"].append(np.nan)
@@ -86,5 +92,40 @@ class MetricsReporting:
             for label in ax.get_xticklabels():
                 label.set_rotation(90)
 
-        plt.show()
         plt.tight_layout()
+        plt.show()
+
+
+class PlotPredictionActual:
+    def __init__(self, actual: pd.DataFrame, y_pred: pd.DataFrame, timestamp: str):
+        self.actual = actual
+        self.actual.set_index("datetime", inplace=True)
+        self.y_pred = y_pred
+        self.timestamp = pd.to_datetime(timestamp)
+
+    def restructure_prediction(self):
+        filtered_y_pred = self.y_pred.loc[[self.timestamp]]
+        transformed_pred = filtered_y_pred.iloc[0].T
+        num_rows = len(transformed_pred)
+        new_index = pd.date_range(
+            start=self.timestamp + pd.Timedelta(hours=1), periods=num_rows, freq="h"
+        )
+        df_predict = transformed_pred.to_frame(name=f"Prediction {self.timestamp}")
+        df_predict["datetime"] = new_index
+        df_predict.set_index("datetime", inplace=True)
+        return df_predict
+
+    def plot_sample(self):
+        pred = self.restructure_prediction()
+        if not self.actual.index.intersection(pred.index).empty:
+            actual_prediction = pd.merge(
+                self.actual,
+                pred,
+                left_index=True,
+                right_index=True,
+                how="inner",
+            )
+            actual_prediction.plot()
+        else:
+            pred.plot()
+        plt.show()

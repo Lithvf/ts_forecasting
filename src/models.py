@@ -58,6 +58,7 @@ class Model:
         """Internal method for standard model fitting."""
         self.trained_model = self.model_instance.fit(X=self.X_train, y=self.y_train)
         self.y_pred_train = self.trained_model.predict(self.X_train)
+        self.y_pred_train = pd.DataFrame(self.y_pred_train, index=self.X_train.index)
 
     def _fit_gridsearch(self, param_grid: dict):
         """Internal method for fitting with GridSearchCV."""

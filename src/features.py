@@ -9,7 +9,14 @@ class CreateFeatures:
     It prepares the data into X (features) and y (target) for model training.
     """
 
-    def __init__(self, data: pd.DataFrame, target: str, horizon: int = 1):
+    def __init__(
+        self,
+        data: pd.DataFrame,
+        lag_features: list,
+        target: str,
+        purpose: str,
+        horizon: int = 1,
+    ):
         """
         Initializes the CreateFeatures instance and builds the features.
 
@@ -19,7 +26,9 @@ class CreateFeatures:
             horizon (int, optional): The number of future steps to forecast.
         """
         self.data = data.copy()
+        self.lags = lag_features.copy()
         self.target = target
+        self.purpose = purpose
         self.horizon = horizon
         if horizon < 1:
             raise ValueError("Horizon must be a positive integer (>= 1).")
@@ -30,10 +39,10 @@ class CreateFeatures:
         Internal method to orchestrate the feature creation process.
         """
         self._add_time_features()
-        self._add_lag_features()
+        self._add_lag_features(self.lags)
         self._create_multi_horizon_targets()
-        self.data.dropna(inplace=True)
-
+        if self.purpose == "training":
+            self.data.dropna(inplace=True)
         return self._split_X_y()
 
     def _add_time_features(self):

@@ -24,7 +24,7 @@ class MetricsReporting:
         y_true = y_true.loc[y_pred.index]
         return y_true, y_pred
 
-    def _calculate_metrics(self):
+    def calculate_metrics(self):
         """Internal method to calculate all relevant metrics."""
 
         if self.y_pred.ndim > 1:
@@ -83,9 +83,11 @@ class MetricsReporting:
                 np.mean(np.abs((self.y_true - self.y_pred) / self.y_true)) * 100
             ]
 
+        return self.metrics
+
     def visualize_metrics(self):
-        self._calculate_metrics()
-        self.metrics_df = pd.DataFrame(self.metrics)
+        metrics = self.calculate_metrics()
+        self.metrics_df = pd.DataFrame(metrics)
         print(self.metrics_df)
         if self.y_pred.ndim <= 1:
             print(

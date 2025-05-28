@@ -32,8 +32,7 @@ class Model:
     def train(
         self,
         X_train: pd.DataFrame,
-        y_train: pd.Series,
-        train_df: pd.DataFrame,
+        y_train: pd.DataFrame,
         param_grid: dict = None,
     ):
         """
@@ -42,12 +41,10 @@ class Model:
         Args:
             X_train (pd.DataFrame): Training features.
             y_train (pd.Series): Training target.
-            train_df (pd.DataFrame): Original training DataFrame for plotting context.
             param_grid (dict, optional): Dictionary of hyperparameters for GridSearchCV.
         """
         self.X_train = X_train
         self.y_train = y_train
-        self.train_df = train_df
         self.model_instance = self.model_cls()
         if param_grid:
             self._fit_gridsearch(param_grid)
@@ -58,10 +55,11 @@ class Model:
         """Internal method for standard model fitting."""
         self.trained_model = self.model_instance.fit(X=self.X_train, y=self.y_train)
         self.y_pred_train = self.trained_model.predict(self.X_train)
-        self.y_pred_train = pd.DataFrame(self.y_pred_train, index=self.X_train.index)
+        self.y_pred_train = pd.DataFrame(self.y_pred_train, index=self.y_train.index)
 
     def _fit_gridsearch(self, param_grid: dict):
         """Internal method for fitting with GridSearchCV."""
+        print("starting grid search...")
         tscv = TimeSeriesSplit(n_splits=3)
 
         grid_search = GridSearchCV(
@@ -75,3 +73,4 @@ class Model:
         grid_search.fit(self.X_train, self.y_train)
         self.trained_model = grid_search.best_estimator_
         self.y_pred_train = self.trained_model.predict(self.X_train)
+        self.y_pred_train = pd.DataFrame(self.y_pred_train, index=self.y_train.index)

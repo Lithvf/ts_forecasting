@@ -7,17 +7,22 @@ import matplotlib.pyplot as plt
 
 
 class MetricsReporting:
-    def __init__(self, y_pred, y_true):
+    def __init__(self, y_pred: pd.DataFrame, y_true: pd.DataFrame, purpose: str):
         y_true = y_true.copy()
         y_pred = y_pred.copy()
-        y_true.set_index("datetime", inplace=True)
-        y_true = y_true.loc[y_pred.index]
+        if purpose == "test":
+            y_true, y_pred = self._align_indices(y_true, y_pred)
         self.y_pred = np.asarray(y_pred)
         self.y_true = np.asarray(y_true)
         if self.y_pred.ndim == 2 and self.y_pred.shape[1] == 1:
             self.y_pred = self.y_pred.flatten()
         self.metrics = {}
         self.sample = {}
+
+    def _align_indices(self, y_true, y_pred):
+        y_true.set_index("datetime", inplace=True)
+        y_true = y_true.loc[y_pred.index]
+        return y_true, y_pred
 
     def _calculate_metrics(self):
         """Internal method to calculate all relevant metrics."""
@@ -78,18 +83,15 @@ class MetricsReporting:
                 np.mean(np.abs((self.y_true - self.y_pred) / self.y_true)) * 100
             ]
 
-    def print(self):
+    def visualize_metrics(self):
         self._calculate_metrics()
         self.metrics_df = pd.DataFrame(self.metrics)
         print(self.metrics_df)
-
-    def plot_metrics(self):
         if self.y_pred.ndim <= 1:
-            print("One dimensional data is not plotted")
+            print(
+                "One dimensional reporting data is not plotted, look at the logging instead."
+            )
         else:
-            if not self.metrics:
-                self._calculate_metrics()
-                self.metrics_df = pd.DataFrame(self.metrics)
             fig, axes = plt.subplots(1, 3, figsize=(24, 6))
             axes[0].plot(
                 self.metrics_df[["horizon", "rmse_per_horizon"]].set_index("horizon"),
@@ -120,7 +122,7 @@ class PlotPredictionActual:
     def __init__(
         self, actual: pd.DataFrame, y_pred: pd.DataFrame, timestamp: str = None
     ):
-        self.actual = actual
+        self.actual = actual.copy()
         self.actual.set_index("datetime", inplace=True)
         self.y_pred = y_pred
         if timestamp:

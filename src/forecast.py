@@ -67,9 +67,8 @@ class MultiHorizonForecaster:
         - plot: whether to plot forecast
         """
         self.model = model
-        self.history_data = history_data
+        self.history_data = history_data.copy()
         self.horizon = horizon
-
         self.forecasts = self.forecaster()
 
     def forecaster(self):

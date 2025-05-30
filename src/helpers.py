@@ -43,7 +43,7 @@ class MetricsReporting:
             self.sample["actual"] = []
 
             for i in range(num_horizons):
-                self.metrics["horizon"].append(f"t+{i + 1}")
+                self.metrics["horizon"].append(f"t{i + 1}")
                 y_true_h = self.y_true[:, i]
                 y_pred_h = self.y_pred[:, i]
 

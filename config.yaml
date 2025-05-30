@@ -1,0 +1,19 @@
+model:
+  name: XGBRegressor
+  grid_params:
+    n_estimators: [100, 200]
+    max_depth: [2, 3]
+    learning_rate: [0.01, 0.05]
+    subsample: [0.6, 0.8]
+    reg_lambda: [5, 10]
+    reg_alpha: [0.1, 1]
+
+features:
+  lag_features: [1, 2, 3, 4, 5, 6, 7, 24, 168]
+  include_time_features: true
+
+split:
+  timestamp_start: "2017-10-01"
+
+forecasting:
+  horizon: 24

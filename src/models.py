@@ -1,7 +1,6 @@
 """Script with classes to train, test and forecast models."""
 
-from sklearn.metrics import mean_squared_error, r2_score
-import numpy as np
+from xgboost import XGBRegressor
 import pandas as pd
 from sklearn.model_selection import TimeSeriesSplit, GridSearchCV
 
@@ -12,21 +11,24 @@ class Model:
     and gives metrics for the trained model.
     """
 
-    def __init__(self, model_cls, plot: bool = False):
+    def __init__(self, model_cls):
         """
-        Initializes the ModelHandler with a model class and plotting preference.
+        Initializes the ModelHandler with a model class name or object.
 
         Args:
-            model_cls: The model class.
-            plot (bool, optional).
+            model_cls (str or type): Model name string (e.g. "XGBRegressor") or a class.
+            model_params (dict, optional): Parameters to initialize the model with.
         """
-        if not hasattr(model_cls, "fit") or not hasattr(model_cls, "predict"):
-            raise TypeError(
-                "model_cls must be a compatible estimator with 'fit' and 'predict' methods."
-            )
+        self.model_registry = {
+            "XGBRegressor": XGBRegressor,
+        }
+
+        if isinstance(model_cls, str):
+            if model_cls not in self.model_registry:
+                raise ValueError(f"Model '{model_cls}' is not supported.")
+            model_cls = self.model_registry[model_cls]
         self.model_cls = model_cls
         self.trained_model = None
-        self.plot = plot
         self.metrics_results = {}
 
     def train(

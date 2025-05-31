@@ -41,7 +41,7 @@ class CreateFeatures:
         self._add_time_features()
         self._add_lag_features(self.lags)
         self._create_multi_horizon_targets()
-        if self.purpose == "training":
+        if self.purpose == "training" or self.purpose == "testing":
             self.data.dropna(inplace=True)
         return self._split_X_y()
 

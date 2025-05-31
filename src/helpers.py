@@ -10,8 +10,9 @@ class MetricsReporting:
     def __init__(self, y_pred: pd.DataFrame, y_true: pd.DataFrame, purpose: str):
         y_true = y_true.copy()
         y_pred = y_pred.copy()
-        if purpose == "test":
+        if purpose == "inference":
             y_true, y_pred = self._align_indices(y_true, y_pred)
+        self.purpose = purpose
         self.y_pred = np.asarray(y_pred)
         self.y_true = np.asarray(y_true)
         if self.y_pred.ndim == 2 and self.y_pred.shape[1] == 1:
@@ -85,10 +86,10 @@ class MetricsReporting:
 
         return self.metrics
 
-    def visualize_metrics(self):
+    def visualize_metrics(self, run_id=None, show=False, save=False):
         metrics = self.calculate_metrics()
         self.metrics_df = pd.DataFrame(metrics)
-        print(self.metrics_df)
+        # print(self.metrics_df)
         if self.y_pred.ndim <= 1:
             print(
                 "One dimensional reporting data is not plotted, look at the logging instead."
@@ -117,7 +118,11 @@ class MetricsReporting:
                     label.set_rotation(90)
 
             plt.tight_layout()
-            plt.show()
+            if show == True:
+                plt.show()
+            if save == True:
+                plot_title = f"plots/metrics_{self.purpose}_horizons_{run_id}"
+                plt.savefig(plot_title)
 
 
 class PlotPredictionActual:

@@ -1,9 +1,24 @@
-To be updated:
-This repository is made to apply different time series forecasting models on a Kaggle dataset that contains energy consumption data of PJM - East.
+# Multi-horizon timeseries - energy usage forecasting
 
-The XGBoost model insights:
-The trained model generates on the training set: RMSE = 661.68, R2 = 0.99, MAPE = 1.50.
-The trained model generates on the test set: RMSE = 677.68, R2 = 0.99, MAPE = 1.66.
-With a forecasting horizon of 48 hours, the trained model forecasts recursively on the test data: RMSE = 6419.45, R2 = -0.72, MAPE = 18.09. See the plot for the forecast vs. actual data.
-![Figure_1](https://github.com/user-attachments/assets/8528be87-5de4-44a7-888a-8c3f15dac090)
+This project uses machine learning (XGBoost model) to forecast hourly energy usage for the PJM Interconnection based on this Kaggle dataset https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption.  
+The project contains an automatic pipeline for training and testing. It supports multi-horizon forecasting (up to x hours ahead) and tracks experiments with MLflow. Todo: Add an inference pipeline, the functions are already included to conduct inference based on a registered model.  
+The model is trained on lag features, see config.yaml for the lags included. Gridsearch is applied to find the best model, see the gridsearch parameters in config.yaml.
 
+## MLflow Experiment Summary
+
+**Experiment Name:** `Multi horizon - Energy forecast`  
+**Best Model:** `XGBRegressor`  
+**Horizon:** `24 hours`  
+**Best Run ID:** `ee62e28759324fb6a84f77e69a09bc1f`  
+**Logged in MLflow**: -  
+
+Average performance per horizon on the test dataset RMSE, R2, MAPE:  
+
+
+![image](https://github.com/user-attachments/assets/2d546dec-e53a-44c7-932d-f1e949e78ec3)
+
+## Installation
+
+```bash
+git clone https://github.com/yourname/energy-forecasting.git
+poetry install

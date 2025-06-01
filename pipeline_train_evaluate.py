@@ -79,7 +79,7 @@ def train_model(config_dict, purpose):
     ).get_features_and_target()
 
     trained_model = Model(config_dict["model_name"])
-    trained_model.train(X_train, y_train)
+    trained_model.train(X_train, y_train, param_grid=config_dict["grid_params"])
     return trained_model
 
 

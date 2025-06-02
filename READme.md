@@ -1,4 +1,4 @@
-# Multi-horizon timeseries - energy usage forecasting
+# Forecasting of multi-horizon timeseries - energy usage
 
 This project uses machine learning (XGBoost model) to forecast hourly energy usage for the PJM Interconnection based on this Kaggle dataset https://www.kaggle.com/datasets/robikscube/hourly-energy-consumption.  
 The project contains an automatic pipeline for training and testing. It supports multi-horizon forecasting (up to x hours ahead) and tracks experiments with MLflow.   

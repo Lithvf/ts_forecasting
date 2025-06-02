@@ -7,6 +7,10 @@ The model is trained on lag features, see config.yaml for the lags included. Gri
 
 Todo: Add an inference pipeline, the functions are already included to conduct inference based on a registered model.  
 
+Next step (software): Set workflow up with Airflow or Snowflake  
+
+Next step (model): Create probabilistic forecasts
+
 ## MLflow Experiment Summary
 
 **Experiment Name:** `Multi horizon - Energy forecast`  

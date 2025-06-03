@@ -49,4 +49,7 @@ ts_forecasting/
 
 ```bash
 git clone https://github.com/Lithvf/ts_forecasting.git
-poetry install
+pip install poetry
+poetry env use python
+poetry shell
+poetry install 

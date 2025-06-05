@@ -121,7 +121,9 @@ class MetricsReporting:
             if show == True:
                 plt.show()
             if save == True:
-                plot_title = f"plots/metrics_{self.purpose}_horizons_{run_id}"
+                import os
+                os.makedirs("plots", exist_ok=True)
+                plot_title = f"plots/metrics_{self.purpose}_horizons_{run_id}.png"
                 plt.savefig(plot_title)
 
 

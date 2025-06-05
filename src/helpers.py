@@ -4,6 +4,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
 
 
 class MetricsReporting:
@@ -121,7 +122,6 @@ class MetricsReporting:
             if show == True:
                 plt.show()
             if save == True:
-                import os
                 os.makedirs("plots", exist_ok=True)
                 plot_title = f"plots/metrics_{self.purpose}_horizons_{run_id}.png"
                 plt.savefig(plot_title)
